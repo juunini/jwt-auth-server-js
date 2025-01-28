@@ -1,6 +1,10 @@
-import { describe, it, expect, vitest } from 'vitest';
+import { describe, it, expect, vitest, beforeEach } from 'vitest';
 import { JwtAuth } from '.';
 import type { AccessTokenConfig, RefreshTokenConfig } from './constructor';
+
+beforeEach(() => {
+  vitest.useFakeTimers();
+});
 
 describe('JwtAuth', () => {
   const mockPayload = { userId: 1 };
@@ -48,5 +52,52 @@ describe('JwtAuth', () => {
     vitest.spyOn(global.Date, 'now').mockImplementationOnce(() => Date.now() + 10 * 60 * 1000); // 10 minutes later
     const isValid = jwtAuth.verify(expiredToken);
     expect(isValid).toBe(false);
+  });
+
+  it('should refresh tokens with valid access and refresh tokens', async () => {
+    const tokens = jwtAuth.login(mockPayload);
+
+    vitest.advanceTimersByTime(1000);
+
+    const newTokens = await jwtAuth.refresh(tokens);
+
+    expect(newTokens).toHaveProperty('accessToken');
+    expect(newTokens).toHaveProperty('refreshToken');
+    expect(newTokens.accessToken).not.toBe(tokens.accessToken);
+    expect(newTokens.refreshToken).not.toBe(tokens.refreshToken);
+  });
+  
+  it('should not refresh tokens with invalid refresh token', () => {
+    const tokens = jwtAuth.login(mockPayload);
+    const invalidRefreshToken = 'invalidRefreshToken';
+
+    try {
+      jwtAuth.refresh({ accessToken: tokens.accessToken, refreshToken: invalidRefreshToken });
+    } catch (error) {
+      expect(error).not.toBeNull();
+    }
+  });
+  
+  it('should not refresh tokens with expired refresh token', async () => {
+    const tokens = jwtAuth.login(mockPayload);
+    // Simulate refresh token expiration by manipulating the system clock or mocking the verify function
+    vitest.spyOn(global.Date, 'now').mockImplementationOnce(() => Date.now() + 8 * 24 * 60 * 60 * 1000); // 8 days later
+
+    try {
+      await jwtAuth.refresh(tokens);
+    } catch (error) {
+      expect(error).not.toBeNull();
+    }
+  });
+  
+  it('should not refresh tokens with invalid access token', async () => {
+    const tokens = jwtAuth.login(mockPayload);
+    const invalidAccessToken = 'invalidAccessToken';
+
+    try {
+      await jwtAuth.refresh({ accessToken: invalidAccessToken, refreshToken: tokens.refreshToken });
+    } catch (error) {
+      expect(error).not.toBeNull();
+    }
   });
 });

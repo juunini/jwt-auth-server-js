@@ -2,7 +2,7 @@ import { sign } from "jsonwebtoken";
 
 import type { AccessTokenConfig, Alg, RefreshTokenConfig } from "./constructor";
 
-export type Payload = string | Buffer | object;
+export type Payload = object;
 
 export function login(
   payload: Payload,
@@ -21,7 +21,10 @@ export function login(
       }
     ),
     refreshToken: sign(
-      payload,
+      {
+        ...payload,
+        jwtAuthTokenType: "refresh",
+      },
       secret,
       {
         expiresIn: refreshTokenConfig.expiresIn,
@@ -29,5 +32,4 @@ export function login(
       },
     ),
   };
-
 }

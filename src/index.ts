@@ -8,6 +8,7 @@ import type {
 } from "./constructor";
 import { login, type Payload } from "./login";
 import { verify } from "./verify";
+import { refresh } from "./refresh";
 
 export class JwtAuth {
   private readonly alg: Alg;
@@ -39,5 +40,17 @@ export class JwtAuth {
 
   verify(token: string): boolean {
     return verify(token, this.secret);
+  }
+
+  refresh({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
+    return refresh({
+      accessToken,
+      refreshToken,
+      secret: this.secret,
+      alg: this.alg,
+      accessTokenConfig: this.accessTokenConfig,
+      refreshTokenConfig: this.refreshTokenConfig,
+      redisClient: this.redisClient,
+    });
   }
 }
