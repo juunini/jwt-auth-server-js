@@ -24,18 +24,19 @@ export default class JWTAuth {
     accessToken = { expiresIn: '5m' },
     refreshToken = { expiresIn: '1d' },
     redis,
+    redisCluster,
   }: JwtAuthConstructor) {
     this.alg = alg;
     this.secret = secret;
     this.accessTokenConfig = accessToken;
     this.refreshTokenConfig = refreshToken;
 
-    if (redis && redis.clusterStartupNodes === undefined) {
+    if (redis) {
       this.redisClient = new Redis(redis);
     }
 
-    if (redis && redis.clusterStartupNodes) {
-      this.redisClient = new Redis.Cluster(redis.clusterStartupNodes, redis.clusterOptions);
+    if (redisCluster) {
+      this.redisClient = new Redis.Cluster(redisCluster.startupNodes, redisCluster.options);
     }
   }
 

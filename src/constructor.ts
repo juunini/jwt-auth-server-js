@@ -10,9 +10,9 @@ export interface AccessTokenConfig {
 export interface RefreshTokenConfig {
   expiresIn: ExpiresIn;
 }
-export interface RedisProps extends RedisOptions {
-  clusterStartupNodes: ClusterNode[];
-  clusterOptions?: ClusterOptions;
+export interface RedisClusterProps {
+  startupNodes: ClusterNode[];
+  options?: ClusterOptions;
 }
 
 export interface JwtAuthConstructor {
@@ -20,5 +20,6 @@ export interface JwtAuthConstructor {
   secret: string;
   accessToken: AccessTokenConfig;
   refreshToken: RefreshTokenConfig;
-  redis?: RedisProps;
+  redis?: RedisOptions;
+  redisCluster?: RedisClusterProps;
 }

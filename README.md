@@ -23,9 +23,11 @@ const jwtAuth = new JWTAuth({
     db: 0, // optional
     username: 'user', // optional
     password: 'pass', // optional
-    clusterStartupNodes: [ ... ], // if you use cluster, upper host and port are not needed
-    clusterOptions: { ... }, // optional
   },
+  redisCluster: { // optional, if you use redis cluster
+    startupNodes: [ ... ],
+    options: { ... }, // optional
+  }
 });
 ```
 
