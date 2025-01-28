@@ -8,7 +8,7 @@ import type {
 } from "./constructor";
 import { login, type Payload } from "./login";
 import { verify, verifyAsync } from "./verify";
-import { refresh } from "./refresh";
+import { refresh, refreshAsync } from "./refresh";
 import { logout } from "./logout";
 
 export default class JWTAuth {
@@ -19,10 +19,10 @@ export default class JWTAuth {
   private readonly redisClient: Redis | Cluster | undefined;
 
   constructor({
-    alg,
+    alg = "HS256",
     secret,
-    accessToken,
-    refreshToken,
+    accessToken = { expiresIn: '5m' },
+    refreshToken = { expiresIn: '1d' },
     redis,
   }: JwtAuthConstructor) {
     this.alg = alg;
@@ -59,7 +59,18 @@ export default class JWTAuth {
   }
 
   refresh({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
-    return refresh({
+    if (this.redisClient === undefined) {
+      return refresh({
+        accessToken,
+        refreshToken,
+        secret: this.secret,
+        alg: this.alg,
+        accessTokenConfig: this.accessTokenConfig,
+        refreshTokenConfig: this.refreshTokenConfig,
+      });
+    }
+
+    return refreshAsync({
       accessToken,
       refreshToken,
       secret: this.secret,

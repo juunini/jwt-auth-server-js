@@ -5,16 +5,17 @@
 ### Init
 
 ```ts
+// const { default: JWTAuth } = require('@juunini/jwt-auth-server');
 import JWTAuth from '@juunini/jwt-auth-server';
 
 const jwtAuth = new JWTAuth({
-  alg: 'HS256',
+  alg: 'HS256', // default: HS256
   secret: 'your-awesome-secret',
   accessToken: {
-    expire: '5m', // recommand 5m ~ 30m (min: 1m, max: 30m)
+    expire: '5m', // recommand 5m ~ 30m (default: 5m)
   },
   refreshToken: {
-    expire: '1d',
+    expire: '1d', // recommand 1d ~ 7d (default: 1d)
   },
   redis: { // optional, but recommand
     host: '127.0.0.1',
