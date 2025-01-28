@@ -16,8 +16,7 @@ export default class JwtAuth {
   private readonly secret: string;
   private readonly accessTokenConfig: AccessTokenConfig;
   private readonly refreshTokenConfig: RefreshTokenConfig;
-  private readonly redisClient: Redis | undefined;
-  private readonly redisCluster: Cluster | undefined;
+  private readonly redisClient: Redis | Cluster | undefined;
 
   constructor({
     alg,
@@ -25,19 +24,18 @@ export default class JwtAuth {
     accessToken,
     refreshToken,
     redis,
-    redisCluster,
   }: JwtAuthConstructor) {
     this.alg = alg;
     this.secret = secret;
     this.accessTokenConfig = accessToken;
     this.refreshTokenConfig = refreshToken;
 
-    if (redis) {
+    if (redis && redis.clusterStartupNodes === undefined) {
       this.redisClient = new Redis(redis);
     }
 
-    if (redisCluster) {
-      this.redisCluster = new Redis.Cluster(redisCluster.startupNodes, redisCluster.options);
+    if (redis && redis.clusterStartupNodes) {
+      this.redisClient = new Redis.Cluster(redis.clusterStartupNodes, redis.clusterOptions);
     }
   }
 
@@ -50,7 +48,6 @@ export default class JwtAuth {
       token,
       secret: this.secret,
       redisClient: this.redisClient,
-      redisCluster: this.redisCluster,
     });
   }
 

@@ -6,15 +6,13 @@ import { getRedisKey, redisBlacklistTokenKey } from "./redis";
 interface VerifyProps {
   token: string;
   secret: string;
-  redisClient?: Redis;
-  redisCluster?: Cluster;
+  redisClient?: Redis | Cluster;
 }
 
 export async function verify({
   token,
   secret,
   redisClient,
-  redisCluster,
 }: VerifyProps): Promise<boolean> {
   try {
     jwtVerify(token, secret);
@@ -22,10 +20,9 @@ export async function verify({
     return false;
   }
 
-  if (redisClient || redisCluster) {
+  if (redisClient) {
     const isBlacklistToken = await getRedisKey({
       redisClient,
-      redisCluster,
       key: redisBlacklistTokenKey(token),
     });
 

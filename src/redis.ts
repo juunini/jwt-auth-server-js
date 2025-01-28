@@ -2,17 +2,15 @@ import type { Cluster } from "ioredis";
 import type Redis from "ioredis";
 
 interface GetRedisKeyProps {
-  redisClient?: Redis;
-  redisCluster?: Cluster;
+  redisClient: Redis | Cluster;
   key: string;
 }
 
 export function getRedisKey({
   redisClient,
-  redisCluster,
   key,
 }: GetRedisKeyProps): Promise<string | null> {
-  return (redisClient || redisCluster)!.get(key);
+  return redisClient!.get(key);
 }
 
 export function redisBlacklistTokenKey(token: string): string {
@@ -20,8 +18,7 @@ export function redisBlacklistTokenKey(token: string): string {
 }
 
 interface SetRedisProps {
-  redisClient?: Redis;
-  redisCluster?: Cluster;
+  redisClient: Redis | Cluster;
   key: string;
   value: string;
   expire: number;
@@ -29,10 +26,9 @@ interface SetRedisProps {
 
 export function setRedisKey({
   redisClient,
-  redisCluster,
   key,
   value,
   expire,
 }: SetRedisProps) {
-  return (redisClient || redisCluster)!.set(key, value, "EX", expire);
+  return redisClient.set(key, value, "EX", expire);
 }
