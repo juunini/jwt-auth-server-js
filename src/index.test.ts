@@ -1,5 +1,5 @@
 import { describe, it, expect, vitest, beforeEach } from 'vitest';
-import { JwtAuth } from '.';
+import JwtAuth from '.';
 import type { AccessTokenConfig, RefreshTokenConfig } from './constructor';
 
 beforeEach(() => {

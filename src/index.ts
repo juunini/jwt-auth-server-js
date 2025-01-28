@@ -11,7 +11,7 @@ import { verify } from "./verify";
 import { refresh } from "./refresh";
 import { logout } from "./logout";
 
-export class JwtAuth {
+export default class JwtAuth {
   private readonly alg: Alg;
   private readonly secret: string;
   private readonly accessTokenConfig: AccessTokenConfig;
