@@ -9,6 +9,7 @@ import type {
 import { login, type Payload } from "./login";
 import { verify } from "./verify";
 import { refresh } from "./refresh";
+import { logout } from "./logout";
 
 export class JwtAuth {
   private readonly alg: Alg;
@@ -50,6 +51,18 @@ export class JwtAuth {
       alg: this.alg,
       accessTokenConfig: this.accessTokenConfig,
       refreshTokenConfig: this.refreshTokenConfig,
+      redisClient: this.redisClient,
+    });
+  }
+
+  async logout({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
+    if (this.redisClient === undefined) {
+      return;
+    }
+
+    await logout({
+      accessToken,
+      refreshToken,
       redisClient: this.redisClient,
     });
   }

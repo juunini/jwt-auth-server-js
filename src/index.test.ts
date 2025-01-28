@@ -100,4 +100,35 @@ describe('JwtAuth', () => {
       expect(error).not.toBeNull();
     }
   });
+
+  it('should logout and invalidate tokens', async () => {
+    const tokens = jwtAuth.login(mockPayload);
+  
+    if (jwtAuth['redisClient']) {
+      await jwtAuth.logout(tokens);
+  
+      const isAccessTokenValid = jwtAuth.verify(tokens.accessToken);
+      expect(isAccessTokenValid).toBe(false);
+  
+      try {
+        await jwtAuth.refresh(tokens);
+      } catch (error) {
+        expect(error).not.toBeNull();
+      }
+    }
+  });
+  
+  it('should not throw error if redisClient is undefined', async () => {
+    const jwtAuthWithoutRedis = new JwtAuth({
+      alg: mockAlg,
+      secret: mockSecret,
+      accessToken: mockAccessTokenConfig,
+      refreshToken: mockRefreshTokenConfig,
+      redis: undefined,
+    });
+  
+    const tokens = jwtAuthWithoutRedis.login(mockPayload);
+  
+    await expect(jwtAuthWithoutRedis.logout(tokens)).resolves.not.toThrow();
+  });  
 });

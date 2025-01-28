@@ -33,20 +33,20 @@ export async function refresh({
   return login(payload, secret, alg, accessTokenConfig, refreshTokenConfig);
 }
 
-export function getExpire(token: string): number {
+function getExpire(token: string): number {
   const decodedToken = decode(token) as JwtPayload;
   const exp = decodedToken.exp || 0;
   return exp - Math.floor(Date.now() / 1000);
 }
 
-async function setBlacklistToken(
+export async function setBlacklistToken(
   redisClient: Redis,
   token: string,
 ) {
   const expire = getExpire(token);
 
   if (expire <= 0) {
-    return
+    return;
   }
 
   const key = `jwtAuth:blacklist:${token}`;
