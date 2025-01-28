@@ -1,0 +1,33 @@
+{
+  "name": "jwt-auth-server",
+  "version": "0.0.1-alpha.1",
+  "license": "MIT",
+  "keywords": [
+    "jwt",
+    "auth",
+    "server-side"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juunini/jwt-auth-server.git"
+  },
+  "author": "juunini",
+  "homepage": "https://github.com/juunini/jwt-auth-server",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "@parcel/bundler-library": "^2.13.3",
+    "@parcel/packager-ts": "2.13.3",
+    "@parcel/transformer-typescript-types": "2.13.3",
+    "@types/bun": "latest",
+    "parcel": "^2.13.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
