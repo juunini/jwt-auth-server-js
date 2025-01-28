@@ -5,9 +5,9 @@
 ### Init
 
 ```ts
-import { jwtAuthInit } from '@juunini/jwt-auth-server';
+import JWTAuth from '@juunini/jwt-auth-server';
 
-jwtAuthInit({
+const jwtAuth = new JWTAuth({
   alg: 'HS256',
   secret: 'your-awesome-secret',
   accessToken: {
@@ -22,54 +22,48 @@ jwtAuthInit({
     db: 0, // optional
     username: 'user', // optional
     password: 'pass', // optional
+    clusterStartupNodes: [ ... ], // if you use cluster, upper host and port are not needed
+    clusterOptions: { ... }, // optional
   },
 });
 ```
+
+- alg: see [jsonwebtoken algorithms supported](https://github.com/auth0/node-jsonwebtoken?tab=readme-ov-file#algorithms-supported)
+- *Token.expiresIn: see [@vercel/ms](https://github.com/vercel/ms)
+- redis: see [ioredis connect](https://github.com/redis/ioredis?tab=readme-ov-file#connect-to-redis)  
+    or see [ioredis cluster](https://github.com/redis/ioredis?tab=readme-ov-file#cluster)
 
 ### Login
 
 ```ts
-import { jwtAuthLogin } from '@juunini/jwt-auth-server';
-
-const { accessToken, refreshToken } = await jwtAuthLogin({
-  payload: {
-    // exp is automatically set
-    iss: '',
-    sub: '',
-    aud: '',
-    // ...
-  },
-});
+jwtAuth.login({ ...payload });
 ```
 
-### Validation
+### Verify
 
 ```ts
-import { jwtAuthValidation } from '@juunini/jwt-auth-server';
+// if you not set redis connection
+jwtAuth.verify(accessToken);
 
-if (jwtAuthValidation(token/* accessToken or refreshToken */)) {
-  // Do something
-}
+// if you set redis connection
+await jwtAuth.verify(refreshToken);
 ```
 
 ### Refresh
 
 ```ts
-const { newAccessToken, newRefreshTonen } = jwtAuthRefresh({
-  accessToken: oldAccessToken,
-  refreshToken: oldRefreshToken,
-});
+const newToken = await jwtAuth.refresh({ accessToken, refreshToken });
+// newToken.accessToken
+// newToken.refreshToken
 ```
 
 ### Logout
 
-You can use logout if you set redis connection info when `jwtAuthInit`
+If you set redis connection, logout method will create blacklist old tokens.
 
 ```ts
-import { jwtAuthLogout } from '@juunini/jwt-auth-server';
-
-await jwtAuthLogout({
-  accessToken: '',
-  refreshToken: '',
+await jwtAuth.logout({
+  accessToken,
+  refreshToken,
 });
 ```
