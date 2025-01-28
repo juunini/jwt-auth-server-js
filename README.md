@@ -9,20 +9,19 @@ import { jwtAuthInit } from '@juunini/jwt-auth-server';
 
 jwtAuthInit({
   alg: 'HS256',
-  typ: 'JWT',
   secret: 'your-awesome-secret',
   accessToken: {
     expire: '5m', // recommand 5m ~ 30m (min: 1m, max: 30m)
   },
   refreshToken: {
     expire: '1d',
-    redis: { // optional, but recommand
-      host: '127.0.0.1',
-      port: 6379,
-      db: 0, // optional
-      username: 'user', // optional
-      password: 'pass', // optional
-    },
+  },
+  redis: { // optional, but recommand
+    host: '127.0.0.1',
+    port: 6379,
+    db: 0, // optional
+    username: 'user', // optional
+    password: 'pass', // optional
   },
 });
 ```
