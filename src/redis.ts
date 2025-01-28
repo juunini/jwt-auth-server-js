@@ -7,14 +7,32 @@ interface GetRedisKeyProps {
   key: string;
 }
 
-export async function getRedisKey({
+export function getRedisKey({
   redisClient,
   redisCluster,
   key,
 }: GetRedisKeyProps): Promise<string | null> {
-  return await (redisClient || redisCluster)!.get(key);
+  return (redisClient || redisCluster)!.get(key);
 }
 
 export function redisBlacklistTokenKey(token: string): string {
   return `jwtAuth:blacklist:${token}`;
+}
+
+interface SetRedisProps {
+  redisClient?: Redis;
+  redisCluster?: Cluster;
+  key: string;
+  value: string;
+  expire: number;
+}
+
+export function setRedisKey({
+  redisClient,
+  redisCluster,
+  key,
+  value,
+  expire,
+}: SetRedisProps) {
+  return (redisClient || redisCluster)!.set(key, value, "EX", expire);
 }

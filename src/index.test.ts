@@ -34,23 +34,23 @@ describe('JwtAuth', () => {
     expect(tokens1.refreshToken).not.toBe(tokens2.refreshToken);
   });
 
-  it('should verify a valid token', () => {
+  it('should verify a valid token', async () => {
     const tokens = jwtAuth.login(mockPayload);
-    const isValid = jwtAuth.verify(tokens.accessToken);
+    const isValid = await jwtAuth.verify(tokens.accessToken);
     expect(isValid).toBe(true);
   });
 
-  it('should not verify an invalid token', () => {
+  it('should not verify an invalid token', async () => {
     const invalidToken = 'invalidToken';
-    const isValid = jwtAuth.verify(invalidToken);
+    const isValid = await jwtAuth.verify(invalidToken);
     expect(isValid).toBe(false);
   });
 
-  it('should not verify an expired token', () => {
+  it('should not verify an expired token', async () => {
     const expiredToken = jwtAuth.login(mockPayload).accessToken;
     // Simulate token expiration by manipulating the system clock or mocking the verify function
     vitest.spyOn(global.Date, 'now').mockImplementationOnce(() => Date.now() + 10 * 60 * 1000); // 10 minutes later
-    const isValid = jwtAuth.verify(expiredToken);
+    const isValid = await jwtAuth.verify(expiredToken);
     expect(isValid).toBe(false);
   });
 

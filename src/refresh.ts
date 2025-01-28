@@ -3,6 +3,8 @@ import { decode, type JwtPayload } from "jsonwebtoken";
 
 import type { AccessTokenConfig, Alg, RefreshTokenConfig } from "./constructor";
 import { login } from "./login";
+import { redisBlacklistTokenKey, setRedisKey } from "./redis";
+import type { Cluster } from "ioredis";
 
 interface RefreshProps {
   accessToken: string;
@@ -12,6 +14,7 @@ interface RefreshProps {
   accessTokenConfig: AccessTokenConfig;
   refreshTokenConfig: RefreshTokenConfig;
   redisClient: Redis | undefined;
+  redisCluster: Cluster | undefined;
 }
 
 export async function refresh({
@@ -22,10 +25,11 @@ export async function refresh({
   accessTokenConfig,
   refreshTokenConfig,
   redisClient,
+  redisCluster,
 }: RefreshProps) {
-  if (redisClient) {
-    await setBlacklistToken(redisClient, accessToken);
-    await setBlacklistToken(redisClient, refreshToken);
+  if (redisClient || redisCluster) {
+    await setBlacklistToken({ redisClient, redisCluster, token: accessToken });
+    await setBlacklistToken({ redisClient, redisCluster, token: refreshToken });
   }
 
   const decodedAccessToken = decode(accessToken);
@@ -39,18 +43,25 @@ function getExpire(token: string): number {
   return exp - Math.floor(Date.now() / 1000);
 }
 
-export async function setBlacklistToken(
-  redisClient: Redis,
-  token: string,
-) {
+interface SetBlacklistTokenProps {
+  redisClient?: Redis;
+  redisCluster?: Cluster;
+  token: string;
+}
+
+export async function setBlacklistToken({
+  redisClient,
+  redisCluster,
+  token,
+}: SetBlacklistTokenProps) {
   const expire = getExpire(token);
 
   if (expire <= 0) {
     return;
   }
 
-  const key = `jwtAuth:blacklist:${token}`;
-  await redisClient.set(key, "1", "EX", expire);
+  const key = redisBlacklistTokenKey(token);
+  await setRedisKey({ redisClient, redisCluster, key, value: "1", expire });
 }
 
 function getPayload(decodedToken: JwtPayload) {
