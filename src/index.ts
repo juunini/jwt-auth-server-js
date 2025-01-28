@@ -1,6 +1,12 @@
 import Redis from "ioredis";
 
-import type { AccessTokenConfig, Alg, JwtAuthConstructor, RefreshTokenConfig } from "./constructor";
+import type {
+  AccessTokenConfig,
+  Alg,
+  JwtAuthConstructor,
+  RefreshTokenConfig,
+} from "./constructor";
+import { login, type Payload } from "./login";
 
 export class JwtAuth {
   private readonly alg: Alg;
@@ -25,20 +31,8 @@ export class JwtAuth {
       this.redisClient = new Redis(redis);
     }
   }
-}
 
-export async function jwtAuthLogin() {
-  console.log('jwtAuthLogin');
-}
-
-export async function jwtAuthValidation() {
-  console.log('jwtAuthValidation');
-}
-
-export async function jwtAuthRefresh() {
-  console.log('jwtAuthRefresh');
-}
-
-export async function jwtAuthLogout() {
-  console.log('jwtAuthLogout');
+  login(payload: Payload) {
+    return login(payload, this.secret, this.alg, this.accessTokenConfig, this.refreshTokenConfig);
+  }
 }
