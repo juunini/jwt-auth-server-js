@@ -7,6 +7,7 @@ import type {
   RefreshTokenConfig,
 } from "./constructor";
 import { login, type Payload } from "./login";
+import { verify } from "./verify";
 
 export class JwtAuth {
   private readonly alg: Alg;
@@ -34,5 +35,9 @@ export class JwtAuth {
 
   login(payload: Payload) {
     return login(payload, this.secret, this.alg, this.accessTokenConfig, this.refreshTokenConfig);
+  }
+
+  verify(token: string): boolean {
+    return verify(token, this.secret);
   }
 }
