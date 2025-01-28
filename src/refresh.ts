@@ -16,7 +16,19 @@ interface RefreshProps {
   redisClient?: Redis | Cluster;
 }
 
-export async function refresh({
+export function refresh({
+  accessToken,
+  secret,
+  alg,
+  accessTokenConfig,
+  refreshTokenConfig,
+}: RefreshProps) {
+  const decodedAccessToken = decode(accessToken);
+  const payload = getPayload(decodedAccessToken as JwtPayload);
+  return login(payload, secret, alg, accessTokenConfig, refreshTokenConfig);
+}
+
+export async function refreshAsync({
   accessToken,
   refreshToken,
   secret,
@@ -30,9 +42,14 @@ export async function refresh({
     await setBlacklistToken({ redisClient, token: refreshToken });
   }
 
-  const decodedAccessToken = decode(accessToken);
-  const payload = getPayload(decodedAccessToken as JwtPayload);
-  return login(payload, secret, alg, accessTokenConfig, refreshTokenConfig);
+  return refresh({
+    accessToken,
+    refreshToken,
+    secret,
+    alg,
+    accessTokenConfig,
+    refreshTokenConfig,
+  });
 }
 
 function getExpire(token: string): number {
