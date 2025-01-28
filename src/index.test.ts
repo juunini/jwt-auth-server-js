@@ -1,5 +1,5 @@
 import { describe, it, expect, vitest, beforeEach } from 'vitest';
-import JwtAuth from '.';
+import JWTAuth from '.';
 import type { AccessTokenConfig, RefreshTokenConfig } from './constructor';
 
 beforeEach(() => {
@@ -13,7 +13,7 @@ describe('JwtAuth', () => {
   const mockRefreshTokenConfig: RefreshTokenConfig = { expiresIn: '7d' };
   const mockAlg = 'HS256';
 
-  const jwtAuth = new JwtAuth({
+  const jwtAuth = new JWTAuth({
     alg: mockAlg,
     secret: mockSecret,
     accessToken: mockAccessTokenConfig,
@@ -34,23 +34,23 @@ describe('JwtAuth', () => {
     expect(tokens1.refreshToken).not.toBe(tokens2.refreshToken);
   });
 
-  it('should verify a valid token', async () => {
+  it('should verify a valid token', () => {
     const tokens = jwtAuth.login(mockPayload);
-    const isValid = await jwtAuth.verify(tokens.accessToken);
+    const isValid = jwtAuth.verify(tokens.accessToken);
     expect(isValid).toBe(true);
   });
 
-  it('should not verify an invalid token', async () => {
+  it('should not verify an invalid token', () => {
     const invalidToken = 'invalidToken';
-    const isValid = await jwtAuth.verify(invalidToken);
+    const isValid = jwtAuth.verify(invalidToken);
     expect(isValid).toBe(false);
   });
 
-  it('should not verify an expired token', async () => {
+  it('should not verify an expired token', () => {
     const expiredToken = jwtAuth.login(mockPayload).accessToken;
     // Simulate token expiration by manipulating the system clock or mocking the verify function
     vitest.spyOn(global.Date, 'now').mockImplementationOnce(() => Date.now() + 10 * 60 * 1000); // 10 minutes later
-    const isValid = await jwtAuth.verify(expiredToken);
+    const isValid = jwtAuth.verify(expiredToken);
     expect(isValid).toBe(false);
   });
 
@@ -119,7 +119,7 @@ describe('JwtAuth', () => {
   });
   
   it('should not throw error if redisClient is undefined', async () => {
-    const jwtAuthWithoutRedis = new JwtAuth({
+    const jwtAuthWithoutRedis = new JWTAuth({
       alg: mockAlg,
       secret: mockSecret,
       accessToken: mockAccessTokenConfig,

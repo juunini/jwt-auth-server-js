@@ -9,14 +9,27 @@ interface VerifyProps {
   redisClient?: Redis | Cluster;
 }
 
-export async function verify({
+export function verify({
+  token,
+  secret,
+}: VerifyProps): boolean {
+  try {
+    jwtVerify(token, secret);
+  } catch {
+    return false;
+  }
+
+  return true;
+}
+
+export async function verifyAsync({
   token,
   secret,
   redisClient,
 }: VerifyProps): Promise<boolean> {
-  try {
-    jwtVerify(token, secret);
-  } catch {
+  const isVerifiedToken = verify({ token, secret });
+
+  if (!isVerifiedToken) {
     return false;
   }
 

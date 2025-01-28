@@ -7,11 +7,11 @@ import type {
   RefreshTokenConfig,
 } from "./constructor";
 import { login, type Payload } from "./login";
-import { verify } from "./verify";
+import { verify, verifyAsync } from "./verify";
 import { refresh } from "./refresh";
 import { logout } from "./logout";
 
-export default class JwtAuth {
+export default class JWTAuth {
   private readonly alg: Alg;
   private readonly secret: string;
   private readonly accessTokenConfig: AccessTokenConfig;
@@ -43,8 +43,15 @@ export default class JwtAuth {
     return login(payload, this.secret, this.alg, this.accessTokenConfig, this.refreshTokenConfig);
   }
 
-  verify(token: string): Promise<boolean> {
-    return verify({
+  verify(token: string): boolean | Promise<boolean> {
+    if (this.redisClient === undefined) {
+      return verify({
+        token,
+        secret: this.secret,
+      });
+    }
+
+    return verifyAsync({
       token,
       secret: this.secret,
       redisClient: this.redisClient,
