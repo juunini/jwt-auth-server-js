@@ -1,6 +1,6 @@
 {
   "name": "@juunini/jwt-auth-server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "keywords": [
     "jwt",
@@ -9,10 +9,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juunini/jwt-auth-server.git"
+    "url": "git+https://github.com/juunini/jwt-auth-server-js.git"
   },
   "author": "juunini",
-  "homepage": "https://github.com/juunini/jwt-auth-server",
+  "homepage": "https://github.com/juunini/jwt-auth-server-js",
   "source": "src/index.ts",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
