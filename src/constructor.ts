@@ -1,4 +1,4 @@
-import type { RedisOptions } from 'ioredis';
+import type { ClusterNode, ClusterOptions, RedisOptions } from 'ioredis';
 import type { StringValue } from 'ms';
 
 export type Alg = 'HS256' | 'HS384' | 'HS512' | 'RS256' | 'RS384' | 'RS512' | 'PS256' | 'PS384' | 'PS512' | 'ES256' | 'ES384' | 'ES512';
@@ -10,6 +10,10 @@ export interface AccessTokenConfig {
 export interface RefreshTokenConfig {
   expiresIn: ExpiresIn;
 }
+export interface RedisClusterProps {
+  startupNodes: ClusterNode[];
+  options?: ClusterOptions;
+}
 
 export interface JwtAuthConstructor {
   alg: Alg;
@@ -17,4 +21,5 @@ export interface JwtAuthConstructor {
   accessToken: AccessTokenConfig;
   refreshToken: RefreshTokenConfig;
   redis?: RedisOptions;
+  redisCluster?: RedisClusterProps;
 }

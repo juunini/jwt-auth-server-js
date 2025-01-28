@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import Redis, { Cluster } from "ioredis";
 
 import type {
   AccessTokenConfig,
@@ -17,6 +17,7 @@ export default class JwtAuth {
   private readonly accessTokenConfig: AccessTokenConfig;
   private readonly refreshTokenConfig: RefreshTokenConfig;
   private readonly redisClient: Redis | undefined;
+  private readonly redisCluster: Cluster | undefined;
 
   constructor({
     alg,
@@ -24,6 +25,7 @@ export default class JwtAuth {
     accessToken,
     refreshToken,
     redis,
+    redisCluster,
   }: JwtAuthConstructor) {
     this.alg = alg;
     this.secret = secret;
@@ -33,14 +35,23 @@ export default class JwtAuth {
     if (redis) {
       this.redisClient = new Redis(redis);
     }
+
+    if (redisCluster) {
+      this.redisCluster = new Redis.Cluster(redisCluster.startupNodes, redisCluster.options);
+    }
   }
 
   login(payload: Payload) {
     return login(payload, this.secret, this.alg, this.accessTokenConfig, this.refreshTokenConfig);
   }
 
-  verify(token: string): boolean {
-    return verify(token, this.secret);
+  verify(token: string): Promise<boolean> {
+    return verify({
+      token,
+      secret: this.secret,
+      redisClient: this.redisClient,
+      redisCluster: this.redisCluster,
+    });
   }
 
   refresh({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
